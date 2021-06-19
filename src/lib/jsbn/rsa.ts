@@ -6,6 +6,7 @@
 
 import {BigInteger, nbi, parseBigInt} from "./jsbn";
 import {SecureRandom} from "./rng";
+import { decode } from "./../asn1js/hex";
 
 
 // function linebrk(s,n) {
@@ -230,7 +231,9 @@ export class RSAKey {
         const c = parseBigInt(ctext, 16);
         const m = this.doPrivate(c);
         if (m == null) { return null; }
-        return pkcs1unpad2(m, (this.n.bitLength() + 7) >> 3);
+        let mh = pkcs1unpad2(m, (this.n.bitLength() + 7) >> 3);
+        return decode(mh);
+        //return pkcs1unpad2(m, (this.n.bitLength() + 7) >> 3);
     }
 
     // Generate a new random private key B bits long, using public expt E
@@ -351,6 +354,8 @@ function pkcs1unpad2(d:BigInteger, n:number):string {
     let ret = "";
     while (++i < b.length) {
         const c = b[i] & 255;
+        ret += c.toString(16);
+        /*
         if (c < 128) { // utf-8 decode
             ret += String.fromCharCode(c);
         } else if ((c > 191) && (c < 224)) {
@@ -359,7 +364,7 @@ function pkcs1unpad2(d:BigInteger, n:number):string {
         } else {
             ret += String.fromCharCode(((c & 15) << 12) | ((b[i + 1] & 63) << 6) | (b[i + 2] & 63));
             i += 2;
-        }
+        }*/
     }
     return ret;
 }
