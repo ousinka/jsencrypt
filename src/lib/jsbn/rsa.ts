@@ -6,7 +6,7 @@
 
 import {BigInteger, nbi, parseBigInt} from "./jsbn";
 import {SecureRandom} from "./rng";
-import { decode } from "./../asn1js/hex";
+import { Hex } from "./../asn1js/hex";
 
 
 // function linebrk(s,n) {
@@ -232,7 +232,9 @@ export class RSAKey {
         const m = this.doPrivate(c);
         if (m == null) { return null; }
         let mh = pkcs1unpad2(m, (this.n.bitLength() + 7) >> 3);
-        return decode(mh);
+         // encoding为utf-8
+        var bt = Hex.decode(mh);
+        return bt;
         //return pkcs1unpad2(m, (this.n.bitLength() + 7) >> 3);
     }
 
