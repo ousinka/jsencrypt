@@ -48,7 +48,7 @@ export declare class JSEncrypt {
      * @return {string} the decrypted string
      * @public
      */
-    decrypt(str: string): string | false;
+    decrypt(str: string): false | number[];
     /**
      * Proxy method for RSAKey object's encrypt, encrypt the string using the public
      * components of the rsa key object. Note that if the object was not set will be created
