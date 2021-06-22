@@ -1,5 +1,122 @@
+## 更新内容
+
+本项目基于jsencrypt做了修复和改进，在支持多种密钥长度的前提下，解决了jsencrypt对分段加解密去掉不友好的问题。
+
+
+
+### 示例：
+
+~~~javascript
+encryptByPublic: function (string, publicKey) {
+        var rsa = new JsEncrypt();
+        rsa.setPublicKey(publicKey);
+        var key = rsa.getKey();
+        try {
+            var ct = "";
+            //1.获取字符串截取点
+            var bytes = new Array();
+            bytes.push(0);
+            var byteNo = 0;
+            var len, c;
+            len = string.length;
+            var temp = 0;
+            var MAX_DECRYPT_BLOCK = key.n.bitLength() / 8 - 11;
+            var offSet = MAX_DECRYPT_BLOCK - 3;
+            for (var i = 0; i < len; i++) {
+                c = string.charCodeAt(i);
+                if (c >= 0x010000 && c <= 0x10FFFF) {
+                    byteNo += 4;
+                } else if (c >= 0x000800 && c <= 0x00FFFF) {
+                    byteNo += 3;
+                } else if (c >= 0x000080 && c <= 0x0007FF) {
+                    byteNo += 2;
+                } else {
+                    byteNo += 1;
+                }
+                if ((byteNo % MAX_DECRYPT_BLOCK) >= offSet || (byteNo % MAX_DECRYPT_BLOCK) == 0) {
+                    if (byteNo - temp >= offSet) {
+                        bytes.push(i);
+                        temp = byteNo;
+                    }
+                }
+            }
+            console.log("=====");
+            //2.截取字符串并分段加密
+            if (bytes.length > 1) {
+                for (var j = 0; j < bytes.length - 1; j++) {
+                    var str;
+                    if (j == 0) {
+                        str = string.substring(0, bytes[j + 1] + 1);
+                    } else {
+                        str = string.substring(bytes[j] + 1, bytes[j + 1] + 1);
+                    }
+                    var t1 = key.encrypt(str);
+                    ct += t1;
+                }
+
+                if (bytes[bytes.length - 1] != string.length - 1) {
+                    var lastStr = string.substring(bytes[bytes.length - 1] + 1);
+                    ct += key.encrypt(lastStr);
+                }
+                return this.hexToBytes(ct);
+            }
+            var t = key.encrypt(string);
+            var y = this.hexToBytes(t);
+            return y;
+        } catch (ex) {
+            return false;
+        }
+    },
+    decryptByPrivate: function (buf, privateKey) {
+        var encrypt = new JsEncrypt();
+        encrypt.setPrivateKey(privateKey);
+        var key = encrypt.getKey();
+        var MAX_DECRYPT_BLOCK = key.n.bitLength() / 8;
+        try {
+            var ct = [];
+            var t1;
+            var bufTmp;
+            var hexTmp;
+            var inputLen = buf.length;
+            //开始长度
+            var offSet = 0;
+            //结束长度
+            var endOffSet = MAX_DECRYPT_BLOCK;
+            //分段解密
+            while (inputLen - offSet > 0) {
+                if (inputLen - offSet > MAX_DECRYPT_BLOCK) {
+                    bufTmp = buf.slice(offSet, endOffSet);
+                    hexTmp = this.bytesToHex(bufTmp);
+                    t1 = key.decrypt(hexTmp);
+                    console.log("t1", t1);
+                    ct.push(...t1);
+                } else {
+                    bufTmp = buf.slice(offSet, inputLen);
+                    hexTmp = this.bytesToHex(bufTmp);
+                    t1 = key.decrypt(hexTmp);
+                    console.log("t1", t1);
+                    ct.push(...t1);
+                }
+                offSet += MAX_DECRYPT_BLOCK;
+                endOffSet += MAX_DECRYPT_BLOCK;
+            }
+
+            var u8bt = new Uint8Array(ct);
+            var str = new TextDecoder().decode(u8bt);
+            return str;
+        } catch (ex) {
+            return false;
+        }
+    }
+~~~
+
+
+
+
+
 Website
 ======================
+
 http://travistidwell.com/jsencrypt
 
 Introduction
