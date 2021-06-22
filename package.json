@@ -1,11 +1,10 @@
 {
   "name": "@ousinka/jsencrypt",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "description": "A Javascript library to perform OpenSSL RSA Encryption, Decryption, and Key Generation.",
-  "main": "bin/jsencrypt.js",
+  "main": "bin/JSEncrypt.js",
   "module": "lib/index.js",
   "types": "lib/index.d.ts",
-  "dependencies": {},
   "devDependencies": {
     "typescript": "^4.2.3",
     "webpack": "^5.24.4",
@@ -23,19 +22,9 @@
   },
   "author": "Travis Tidwell <travis@form.io>",
   "contributors": [
-    {
-      "name": "Travis Tidwell",
-      "email": "travis@form.io",
-      "url": "http://github.com/travist"
-    },
-    {
-      "name": "Antonio",
-      "url": "https://github.com/zoloft"
-    },
-    {
-      "name": "Julio",
-      "url": "https://github.com/jmgaya"
-    }
+    "Travis Tidwell <travis@form.io> (http://github.com/travist)",
+    "Antonio (https://github.com/zoloft)",
+    "Julio (https://github.com/jmgaya)"
   ],
   "homepage": "http://www.travistidwell.com/jsencrypt",
   "repository": {
@@ -45,5 +34,12 @@
   "bugs": {
     "url": "http://github.com/travist/jsencrypt/issues"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "bin": {
+    "jsencrypt": "jsencrypt.js"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  }
 }
